@@ -30,7 +30,7 @@ class App(customtkinter.CTk):
         self.sidebar_frame = customtkinter.CTkFrame(self, width=140, corner_radius=0)
         self.sidebar_frame.grid(row=0, column=0, rowspan=4, sticky="nsew")
         self.sidebar_frame.grid_rowconfigure(4, weight=1)
-        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="CustomTkinter", font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Better resource\nmonitor than\nErwin's\nresource monitor :D", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
         self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, command=self.sidebar_button_event)
         self.sidebar_button_1.grid(row=1, column=0, padx=20, pady=10)
@@ -53,50 +53,46 @@ class App(customtkinter.CTk):
         #self.textbox = customtkinter.CTkTextbox(self, width=250)
         #self.textbox.grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
 
+        self.graph_frame = customtkinter.CTkScrollableFrame(self, label_text="Resources")
+        self.graph_frame.grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.grid_rowconfigure(0, weight=1)
+        self.graph_frame.grid_columnconfigure(0, weight=1)
+        self.graphs = []
+
+        #for i in range(100):
+        #    switch = customtkinter.CTkSwitch(master=self.scrollable_frame, text=f"CTkSwitch {i}")
+        #    switch.grid(row=i, column=0, padx=10, pady=(0, 20))
+        #    self.scrollable_frame_switches.append(switch)
+
         cpu_f = Figure(figsize=(5,5), dpi=100)
-        #cpu_f.set_size_inches(1, 1)
         cpu_plot = cpu_f.add_subplot(111)
-        cpu_graph = FigureCanvasTkAgg(cpu_f, self)
-        
-        cpu_graph.get_tk_widget().grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        cpu_graph = FigureCanvasTkAgg(cpu_f, self.graph_frame)
+        cpu_graph.get_tk_widget().grid(row=0, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
         cpu_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
         cpu_plot.set_title("CPU Usage                                                00%")
 
-        #self.toolbar = NavigationToolbar2TkAgg(self.canvas, self)
-        #self.toolbar.update()
-
-        #self.canvas.grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        #self.canvas._tkcanvas.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=True)
-
-        # create tabview
         mem_f = Figure(figsize=(5,5), dpi=100)
         mem_plot = mem_f.add_subplot(111)
-        mem_graph = FigureCanvasTkAgg(mem_f, self)
-        mem_graph.get_tk_widget().grid(row=0, column=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        mem_graph = FigureCanvasTkAgg(mem_f, self.graph_frame)
+        mem_graph.get_tk_widget().grid(row=1, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
         mem_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
         mem_plot.set_title("Memory Usage                                             00%")
 
-        # create slider and progressbar frame
-        self.slider_progressbar_frame = customtkinter.CTkFrame(self, fg_color="transparent")
-        self.slider_progressbar_frame.grid(row=1, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.slider_progressbar_frame.grid_columnconfigure(0, weight=1)
-        self.slider_progressbar_frame.grid_rowconfigure(4, weight=1)
-        self.seg_button_1 = customtkinter.CTkSegmentedButton(self.slider_progressbar_frame)
-        self.seg_button_1.grid(row=0, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        self.progressbar_1 = customtkinter.CTkProgressBar(self.slider_progressbar_frame)
-        self.progressbar_1.grid(row=1, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        self.progressbar_2 = customtkinter.CTkProgressBar(self.slider_progressbar_frame)
-        self.progressbar_2.grid(row=2, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        self.slider_1 = customtkinter.CTkSlider(self.slider_progressbar_frame, from_=0, to=1, number_of_steps=4)
-        self.slider_1.grid(row=3, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
-        self.slider_2 = customtkinter.CTkSlider(self.slider_progressbar_frame, orientation="vertical")
-        self.slider_2.grid(row=0, column=1, rowspan=5, padx=(10, 10), pady=(10, 10), sticky="ns")
-        self.progressbar_3 = customtkinter.CTkProgressBar(self.slider_progressbar_frame, orientation="vertical")
-        self.progressbar_3.grid(row=0, column=2, rowspan=5, padx=(10, 20), pady=(10, 10), sticky="ns")
+        disk_f = Figure(figsize=(5,5), dpi=100)
+        disk_plot = disk_f.add_subplot(111)
+        disk_graph = FigureCanvasTkAgg(disk_f, self.graph_frame)
+        disk_graph.get_tk_widget().grid(row=2, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        lb = 'Used space', 'Unnused space'
+        disk_plot.pie([75, 25], labels=lb)
+        disk_plot.set_title("Disk Usage                                               75%")        
+
+        self.graphs.append(cpu_plot)
+        self.graphs.append(mem_plot)
+        self.graphs.append(cpu_plot)
 
         # create scrollable frame
-        self.scrollable_frame = customtkinter.CTkScrollableFrame(self, label_text="CTkScrollableFrame")
-        self.scrollable_frame.grid(row=1, column=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.scrollable_frame = customtkinter.CTkScrollableFrame(self, label_text="Processes")
+        self.scrollable_frame.grid(row=0, column=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
         self.scrollable_frame.grid_columnconfigure(0, weight=1)
         self.scrollable_frame_switches = []
         for i in range(100):
@@ -110,12 +106,6 @@ class App(customtkinter.CTk):
         self.scrollable_frame_switches[4].select()
         self.appearance_mode_optionemenu.set("Dark")
         self.scaling_optionemenu.set("100%")
-        self.slider_1.configure(command=self.progressbar_2.set)
-        self.slider_2.configure(command=self.progressbar_3.set)
-        self.progressbar_1.configure(mode="indeterminnate")
-        self.progressbar_1.start()
-        self.seg_button_1.configure(values=["CTkSegmentedButton", "Value 2", "Value 3"])
-        self.seg_button_1.set("Value 2")
 
     def open_input_dialog_event(self):
         dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
