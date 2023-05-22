@@ -40,12 +40,7 @@ class App(customtkinter.CTk):
         self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
         self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Light", "Dark", "System"],
                                                                        command=self.change_appearance_mode_event)
-        self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(10, 10))
-        self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="UI Scaling:", anchor="w")
-        self.scaling_label.grid(row=7, column=0, padx=20, pady=(10, 0))
-        self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"],
-                                                               command=self.change_scaling_event)
-        self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
+        self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(10, 50))
 
         # create textbox
         #self.textbox = customtkinter.CTkTextbox(self, width=250)
@@ -66,22 +61,22 @@ class App(customtkinter.CTk):
         self.cpu_plot = self.cpu_f.add_subplot(111)
         self.cpu_graph = FigureCanvasTkAgg(self.cpu_f, self.graph_frame)
         self.cpu_graph.get_tk_widget().grid(row=0, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.cpu_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
+        self.cpu_plot.plot([5,6,1,3,8,9,3,5])
         self.cpu_plot.set_title("CPU Usage                                                00%")
 
         self.mem_f = Figure(figsize=(5,5), dpi=100)
         self.mem_plot = self.mem_f.add_subplot(111)
         self.mem_graph = FigureCanvasTkAgg(self.mem_f, self.graph_frame)
         self.mem_graph.get_tk_widget().grid(row=1, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.mem_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
+        self.mem_plot.plot([5,6,1,3,8,9,3,5])
         self.mem_plot.set_title("Memory Usage                                             00%")
 
         self.disk_f = Figure(figsize=(5,5), dpi=100)
         self.disk_plot = self.disk_f.add_subplot(111)
         self.disk_graph = FigureCanvasTkAgg(self.disk_f, self.graph_frame)
         self.disk_graph.get_tk_widget().grid(row=2, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        lb = 'Used space', 'Unnused space'
-        self.disk_plot.pie([75, 25], labels=lb)
+        lb = 'Unnused space', 'Used space'
+        self.disk_plot.pie([25, 75], labels=lb, explode=(0, 0.05), autopct='%1.1f%%')
         self.disk_plot.set_title("Disk Usage                                               75%")        
 
         # create scrollable frame
@@ -99,7 +94,6 @@ class App(customtkinter.CTk):
         self.scrollable_frame_switches[0].select()
         self.scrollable_frame_switches[4].select()
         self.appearance_mode_optionemenu.set("Dark")
-        self.scaling_optionemenu.set("100%")
 
     def open_input_dialog_event(self):
         dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
@@ -120,27 +114,23 @@ class App(customtkinter.CTk):
         self.cpu_plot = self.cpu_f.add_subplot(111)
         self.cpu_graph = FigureCanvasTkAgg(self.cpu_f, self.graph_frame)
         self.cpu_graph.get_tk_widget().grid(row=0, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.cpu_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
+        self.cpu_plot.plot([5,6,1,3,8,9,3,5])
         self.cpu_plot.set_title("CPU Usage                                                00%")
 
         self.mem_f = Figure(figsize=(5,5), dpi=100)
         self.mem_plot = self.mem_f.add_subplot(111)
         self.mem_graph = FigureCanvasTkAgg(self.mem_f, self.graph_frame)
         self.mem_graph.get_tk_widget().grid(row=1, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.mem_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
+        self.mem_plot.plot([5,6,1,3,8,9,3,5])
         self.mem_plot.set_title("Memory Usage                                             00%")
 
         self.disk_f = Figure(figsize=(5,5), dpi=100)
         self.disk_plot = self.disk_f.add_subplot(111)
         self.disk_graph = FigureCanvasTkAgg(self.disk_f, self.graph_frame)
         self.disk_graph.get_tk_widget().grid(row=2, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        lb = 'Used space', 'Unnused space'
-        self.disk_plot.pie([75, 25], labels=lb)
-        self.disk_plot.set_title("Disk Usage                                               75%")  
-
-    def change_scaling_event(self, new_scaling: str):
-        new_scaling_float = int(new_scaling.replace("%", "")) / 100
-        customtkinter.set_widget_scaling(new_scaling_float)
+        lb = 'Unnused space', 'Used space'
+        self.disk_plot.pie([25, 75], labels=lb, explode=(0, 0.05), autopct='%1.1f%%')
+        self.disk_plot.set_title("Disk Usage                                               75%")         
 
     def sidebar_button_event(self):
         print("sidebar_button click")
