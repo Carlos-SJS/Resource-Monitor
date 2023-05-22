@@ -5,15 +5,13 @@ import matplotlib
 
 from qbstyles import mpl_style
 
-mpl_style(dark=True)
+mpl_style(dark=False)
 
-matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 customtkinter.set_appearance_mode("System") 
 customtkinter.set_default_color_theme("blue")
-
 
 class App(customtkinter.CTk):
     def __init__(self):
@@ -66,15 +64,26 @@ class App(customtkinter.CTk):
 
         cpu_f = Figure(figsize=(5,5), dpi=100)
         cpu_plot = cpu_f.add_subplot(111)
+<<<<<<< HEAD
         cpu_graph = FigureCanvasTkAgg(cpu_f, self.graph_frame)
         cpu_graph.get_tk_widget().grid(row=0, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
+=======
+        cpu_graph = FigureCanvasTkAgg(cpu_f, self)
+        
+        cpu_graph.get_tk_widget().grid(row=0, column=1, padx=(20, 15), pady=(20, 0), sticky="nsew")
+>>>>>>> ba654affe2d67576050f30b2c0178426cf8f93a7
         cpu_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
         cpu_plot.set_title("CPU Usage                                                00%")
 
         mem_f = Figure(figsize=(5,5), dpi=100)
         mem_plot = mem_f.add_subplot(111)
+<<<<<<< HEAD
         mem_graph = FigureCanvasTkAgg(mem_f, self.graph_frame)
         mem_graph.get_tk_widget().grid(row=1, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
+=======
+        mem_graph = FigureCanvasTkAgg(mem_f, self)
+        mem_graph.get_tk_widget().grid(row=0, column=2, padx=(15, 20), pady=(20, 0), sticky="nsew")
+>>>>>>> ba654affe2d67576050f30b2c0178426cf8f93a7
         mem_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
         mem_plot.set_title("Memory Usage                                             00%")
 
@@ -112,6 +121,11 @@ class App(customtkinter.CTk):
         print("CTkInputDialog:", dialog.get_input())
 
     def change_appearance_mode_event(self, new_appearance_mode: str):
+        if new_appearance_mode == "Dark":
+            mpl_style(dark=True)
+        elif new_appearance_mode == "Light":
+            mpl_style(dark=False)
+        
         customtkinter.set_appearance_mode(new_appearance_mode)
 
     def change_scaling_event(self, new_scaling: str):
