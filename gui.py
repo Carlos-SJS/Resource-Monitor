@@ -5,7 +5,7 @@ import matplotlib
 
 from qbstyles import mpl_style
 
-mpl_style(dark=False)
+mpl_style(dark=True)
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -62,42 +62,27 @@ class App(customtkinter.CTk):
         #    switch.grid(row=i, column=0, padx=10, pady=(0, 20))
         #    self.scrollable_frame_switches.append(switch)
 
-        cpu_f = Figure(figsize=(5,5), dpi=100)
-        cpu_plot = cpu_f.add_subplot(111)
-<<<<<<< HEAD
-        cpu_graph = FigureCanvasTkAgg(cpu_f, self.graph_frame)
-        cpu_graph.get_tk_widget().grid(row=0, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-=======
-        cpu_graph = FigureCanvasTkAgg(cpu_f, self)
-        
-        cpu_graph.get_tk_widget().grid(row=0, column=1, padx=(20, 15), pady=(20, 0), sticky="nsew")
->>>>>>> ba654affe2d67576050f30b2c0178426cf8f93a7
-        cpu_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
-        cpu_plot.set_title("CPU Usage                                                00%")
+        self.cpu_f = Figure(figsize=(5,5), dpi=100)
+        self.cpu_plot = self.cpu_f.add_subplot(111)
+        self.cpu_graph = FigureCanvasTkAgg(self.cpu_f, self.graph_frame)
+        self.cpu_graph.get_tk_widget().grid(row=0, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.cpu_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
+        self.cpu_plot.set_title("CPU Usage                                                00%")
 
-        mem_f = Figure(figsize=(5,5), dpi=100)
-        mem_plot = mem_f.add_subplot(111)
-<<<<<<< HEAD
-        mem_graph = FigureCanvasTkAgg(mem_f, self.graph_frame)
-        mem_graph.get_tk_widget().grid(row=1, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-=======
-        mem_graph = FigureCanvasTkAgg(mem_f, self)
-        mem_graph.get_tk_widget().grid(row=0, column=2, padx=(15, 20), pady=(20, 0), sticky="nsew")
->>>>>>> ba654affe2d67576050f30b2c0178426cf8f93a7
-        mem_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
-        mem_plot.set_title("Memory Usage                                             00%")
+        self.mem_f = Figure(figsize=(5,5), dpi=100)
+        self.mem_plot = self.mem_f.add_subplot(111)
+        self.mem_graph = FigureCanvasTkAgg(self.mem_f, self.graph_frame)
+        self.mem_graph.get_tk_widget().grid(row=1, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.mem_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
+        self.mem_plot.set_title("Memory Usage                                             00%")
 
-        disk_f = Figure(figsize=(5,5), dpi=100)
-        disk_plot = disk_f.add_subplot(111)
-        disk_graph = FigureCanvasTkAgg(disk_f, self.graph_frame)
-        disk_graph.get_tk_widget().grid(row=2, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.disk_f = Figure(figsize=(5,5), dpi=100)
+        self.disk_plot = self.disk_f.add_subplot(111)
+        self.disk_graph = FigureCanvasTkAgg(self.disk_f, self.graph_frame)
+        self.disk_graph.get_tk_widget().grid(row=2, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
         lb = 'Used space', 'Unnused space'
-        disk_plot.pie([75, 25], labels=lb)
-        disk_plot.set_title("Disk Usage                                               75%")        
-
-        self.graphs.append(cpu_plot)
-        self.graphs.append(mem_plot)
-        self.graphs.append(cpu_plot)
+        self.disk_plot.pie([75, 25], labels=lb)
+        self.disk_plot.set_title("Disk Usage                                               75%")        
 
         # create scrollable frame
         self.scrollable_frame = customtkinter.CTkScrollableFrame(self, label_text="Processes")
@@ -125,8 +110,33 @@ class App(customtkinter.CTk):
             mpl_style(dark=True)
         elif new_appearance_mode == "Light":
             mpl_style(dark=False)
-        
+
+        self.re_plot()
+
         customtkinter.set_appearance_mode(new_appearance_mode)
+
+    def re_plot(self):
+        self.cpu_f = Figure(figsize=(5,5), dpi=100)
+        self.cpu_plot = self.cpu_f.add_subplot(111)
+        self.cpu_graph = FigureCanvasTkAgg(self.cpu_f, self.graph_frame)
+        self.cpu_graph.get_tk_widget().grid(row=0, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.cpu_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
+        self.cpu_plot.set_title("CPU Usage                                                00%")
+
+        self.mem_f = Figure(figsize=(5,5), dpi=100)
+        self.mem_plot = self.mem_f.add_subplot(111)
+        self.mem_graph = FigureCanvasTkAgg(self.mem_f, self.graph_frame)
+        self.mem_graph.get_tk_widget().grid(row=1, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.mem_plot.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
+        self.mem_plot.set_title("Memory Usage                                             00%")
+
+        self.disk_f = Figure(figsize=(5,5), dpi=100)
+        self.disk_plot = self.disk_f.add_subplot(111)
+        self.disk_graph = FigureCanvasTkAgg(self.disk_f, self.graph_frame)
+        self.disk_graph.get_tk_widget().grid(row=2, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        lb = 'Used space', 'Unnused space'
+        self.disk_plot.pie([75, 25], labels=lb)
+        self.disk_plot.set_title("Disk Usage                                               75%")  
 
     def change_scaling_event(self, new_scaling: str):
         new_scaling_float = int(new_scaling.replace("%", "")) / 100
