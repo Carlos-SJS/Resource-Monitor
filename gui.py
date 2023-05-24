@@ -2,6 +2,10 @@ import tkinter
 import tkinter.messagebox
 import customtkinter
 import matplotlib
+import back_end
+import numpy as np
+
+import psutil
 
 from qbstyles import mpl_style
 
@@ -61,15 +65,21 @@ class App(customtkinter.CTk):
         self.cpu_plot = self.cpu_f.add_subplot(111)
         self.cpu_graph = FigureCanvasTkAgg(self.cpu_f, self.graph_frame)
         self.cpu_graph.get_tk_widget().grid(row=0, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.cpu_plot.plot([5,6,1,3,8,9,3,5])
+        self.cpu_plot.plot([])
         self.cpu_plot.set_title("CPU Usage                                                00%")
+        self.cpu_plot.autoscale(enable=False)
+        self.cpu_plot.set_ylim(0,100)
 
         self.mem_f = Figure(figsize=(5,5), dpi=100)
         self.mem_plot = self.mem_f.add_subplot(111)
         self.mem_graph = FigureCanvasTkAgg(self.mem_f, self.graph_frame)
         self.mem_graph.get_tk_widget().grid(row=1, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.mem_plot.plot([5,6,1,3,8,9,3,5])
+        self.mem_plot.plot([])
         self.mem_plot.set_title("Memory Usage                                             00%")
+        #self.cpu_plot.autoscale(enable=False)
+        self.mem_plot.set_ylim([0,100])
+        #self.mem_plot.set_xlim(0,100)
+        #self.mem_plot.autoscale(enable=False)
 
         self.disk_f = Figure(figsize=(5,5), dpi=100)
         self.disk_plot = self.disk_f.add_subplot(111)
@@ -95,6 +105,8 @@ class App(customtkinter.CTk):
         self.scrollable_frame_switches[4].select()
         self.appearance_mode_optionemenu.set("Dark")
 
+        self.update_data()
+
     def open_input_dialog_event(self):
         dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
         print("CTkInputDialog:", dialog.get_input())
@@ -114,15 +126,24 @@ class App(customtkinter.CTk):
         self.cpu_plot = self.cpu_f.add_subplot(111)
         self.cpu_graph = FigureCanvasTkAgg(self.cpu_f, self.graph_frame)
         self.cpu_graph.get_tk_widget().grid(row=0, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.cpu_plot.plot([5,6,1,3,8,9,3,5])
+        self.cpu_plot.plot(self.cpudata)
         self.cpu_plot.set_title("CPU Usage                                                00%")
+        self.cpu_plot.autoscale(enable=False)
+        self.cpu_plot.set_ylim([0,100])
+        self.cpu_plot.set_xlim([0,100])
+        
+
 
         self.mem_f = Figure(figsize=(5,5), dpi=100)
         self.mem_plot = self.mem_f.add_subplot(111)
         self.mem_graph = FigureCanvasTkAgg(self.mem_f, self.graph_frame)
         self.mem_graph.get_tk_widget().grid(row=1, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
-        self.mem_plot.plot([5,6,1,3,8,9,3,5])
+        self.mem_plot.plot(self.memdata)
         self.mem_plot.set_title("Memory Usage                                             00%")
+        #self.mem_plot.autoscale(enable=False)
+        self.mem_plot.set_ylim([0,100])
+        #self.mem_plot.set_xlim(0,100)
+        
 
         self.disk_f = Figure(figsize=(5,5), dpi=100)
         self.disk_plot = self.disk_f.add_subplot(111)
@@ -130,7 +151,43 @@ class App(customtkinter.CTk):
         self.disk_graph.get_tk_widget().grid(row=2, column=0, padx=(20, 0), pady=(20, 0), sticky="nsew")
         lb = 'Unnused space', 'Used space'
         self.disk_plot.pie([25, 75], labels=lb, explode=(0, 0.05), autopct='%1.1f%%')
-        self.disk_plot.set_title("Disk Usage                                               75%")         
+        self.disk_plot.set_title("Disk Usage                                               75%")  
+
+    def plot_update(self):
+        self.cpu_plot.clear()
+        self.cpu_plot.plot(self.cpudata)
+        self.cpu_plot.set_title(f"CPU Usage                                                {round(self.cpudata[-1], 2)}%")
+        self.cpu_plot.set_ylim([0,100])
+        self.cpu_plot.margins(0)
+
+        #x_fill = np.linspace(0, len(self.cpudata)-1, 1000)
+        #self.cpu_plot.fill_between(x_fill, 2*x_fill, alpha=0.5)
+
+        self.cpu_graph.draw_idle()
+
+        self.mem_plot.clear()
+        self.mem_plot.plot(self.memdata)
+        self.mem_plot.set_title(f"Memory Usage                                             {round(self.memdata[-1], 2)}%")
+        self.mem_plot.set_ylim([0,100])
+        self.mem_plot.margins(0)
+        self.mem_graph.draw_idle()
+
+        lb = 'Unnused space', 'Used space'
+        self.disk_plot.clear()
+        self.disk_plot.pie(self.diskdata, labels=lb, explode=(0, 0.05), autopct='%1.1f%%')
+        self.disk_plot.set_title(f"Disk Usage                                               {self.diskpercent}%")    
+        self.disk_graph.draw_idle()
+
+    def update_data(self):
+        #print(psutil.cpu_percent())
+        self.cpudata = back_end.get_cpu()
+        #print(self.cpudata)
+        self.memdata = back_end.get_memory()
+
+        self.diskdata, self.diskpercent = back_end.get_disk ()
+
+        self.plot_update()
+        self.after(500, self.update_data)
 
     def sidebar_button_event(self):
         print("sidebar_button click")
