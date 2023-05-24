@@ -62,7 +62,7 @@ def keep_updated():
         _get_cpu()
         _get_memory()
         _get_disk()
-        sleep(.1)
+        sleep(.2)
 
 t = threading.Thread(target=keep_updated)
 t.start()

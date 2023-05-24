@@ -187,7 +187,7 @@ class App(customtkinter.CTk):
         self.diskdata, self.diskpercent = back_end.get_disk ()
 
         self.plot_update()
-        self.after(500, self.update_data)
+        self.after(1000, self.update_data)
 
     def sidebar_button_event(self):
         print("sidebar_button click")
