@@ -17,7 +17,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         # configure window
-        self.title("Resource\nMonitor.py")
+        self.title("Resource Monitor.py")
         self.geometry(f"{1200}x{600}")
 
         # configure grid layout (4x4)
@@ -27,7 +27,7 @@ class App(customtkinter.CTk):
         self.sidebar_frame = customtkinter.CTkFrame(self, width=120, corner_radius=0)
         self.sidebar_frame.grid(row=0, column=0, rowspan=4, sticky="nsew")
         self.sidebar_frame.grid_rowconfigure(4, weight=1)
-        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Resource Monitor", font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.logo_label = customtkinter.CTkLabel(self.sidebar_frame, text="Resource\nMonitor", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
         
         self.appearance_mode_label = customtkinter.CTkLabel(self.sidebar_frame, text="Appearance Mode:", anchor="w")
@@ -77,15 +77,15 @@ class App(customtkinter.CTk):
         
         
         self.filter_frame = customtkinter.CTkFrame(self, fg_color='transparent', height=30, width=300)
-        #self.filter_frame.grid_propagate(False)
         self.filter_frame.grid(row=1, column = 2, sticky="EW", padx=(0,0))
         
         
-        self.cpu_button = customtkinter.CTkButton(self.filter_frame, text="CPU", height=25, width=70)
+        self.cpu_button = customtkinter.CTkButton(self.filter_frame, text="CPU", height=25, width=70, command=self.cpu_btp)
         self.cpu_button.grid_propagate(False)
         self.cpu_button.place(relx=.56, y=5)
         
-        self.memory_button = customtkinter.CTkButton(self.filter_frame, text="Memory", height=25, width=70)
+        
+        self.memory_button = customtkinter.CTkButton(self.filter_frame, text="Memory", height=25, width=70, command=self.memory_btp)
         self.memory_button.grid_propagate(False)
         self.memory_button.place(relx=.73, y=5)
         
@@ -154,9 +154,7 @@ class App(customtkinter.CTk):
         self.mem_graph.get_tk_widget().grid(row=1, column=0, padx=(0, 0), pady=(20, 0), sticky="nsew")
         self.mem_plot.plot(self.memdata)
         self.mem_plot.set_title("Memory Usage                                 00%")
-        #self.mem_plot.autoscale(enable=False)
         self.mem_plot.set_ylim([0,100])
-        #self.mem_plot.set_xlim(0,100)
         
 
         self.disk_f = Figure(figsize=(5,5), dpi=100)
@@ -246,10 +244,22 @@ class App(customtkinter.CTk):
             
         self.after(1000, self.update_data)
         self.upd_ct += 1
+        
+    def cpu_btp(self):
+        self.cpu_button.configure(state="disabled", require_redraw=True)
+        self.memory_button.configure(state="enabled")
+        
+        back_end.sort_by = 'cpu'
+        back_end._get_processes()
+        self.upd_ct = 19
 
-    def sidebar_button_event(self):
-        print("sidebar_button click")
-
+    def memory_btp(self):
+        self.cpu_button.configure(state="enabled")
+        self.memory_button.configure(state="disabled", require_redraw=True)
+        
+        back_end.sort_by = 'mem'
+        back_end._get_processes()
+        self.upd_ct = 19
 
 if __name__ == "__main__":
     app = App()
