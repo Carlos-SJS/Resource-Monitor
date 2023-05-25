@@ -51,7 +51,7 @@ def _get_disk():
 def get_disk():
     return [stats.free, stats.used], stats.percent
 
-black_list = ["System Idle Process", "", "MsMpEng.exe", "System", "audiodg.exe", "services.exe", "csrss.exe", "smss.exe", "wininit.exe", "Isass.exe", "Lsalso.exe", "fontdrvhost.exe", "WmiPrvSE.exe", "dwm.exe", "prevhost.exe", "dasHost.exe", "MemCompression", "spoolsv.exe", "MoUsoCoreWorker.exe"]
+black_list = ["Registry", "System Idle Process", "", "MsMpEng.exe", "System", "audiodg.exe", "services.exe", "csrss.exe", "smss.exe", "wininit.exe", "Isass.exe", "Lsalso.exe", "fontdrvhost.exe", "WmiPrvSE.exe", "dwm.exe", "prevhost.exe", "dasHost.exe", "MemCompression", "spoolsv.exe", "MoUsoCoreWorker.exe"]
 def _get_processes():
     global procs
     ps = [p.info for p in psutil.process_iter(['name', 'cpu_percent', 'memory_percent', 'pid'])]

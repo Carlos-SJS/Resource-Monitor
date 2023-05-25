@@ -4,6 +4,8 @@ from qbstyles import mpl_style
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import matplotlib.ticker as mtick
+import os
+import platform
 
 mpl_style(dark=True)
 
@@ -12,6 +14,7 @@ customtkinter.set_default_color_theme("blue")
 
 class App(customtkinter.CTk):
     default_bg_color = "#383838"
+    default_bg_color_s = "#48536b"
     
     def __init__(self):
         super().__init__()
@@ -74,6 +77,7 @@ class App(customtkinter.CTk):
         self.processes_frame.grid_columnconfigure(0, weight=1)
         self.process_labels = []
         self.process_f = []
+        self.pids = []
         
         
         self.filter_frame = customtkinter.CTkFrame(self, fg_color='transparent', height=30, width=300)
@@ -89,7 +93,12 @@ class App(customtkinter.CTk):
         self.memory_button.grid_propagate(False)
         self.memory_button.place(relx=.73, y=5)
         
+        self.kill_button = customtkinter.CTkButton(self.filter_frame, text="Kill task", height=25, width=70, command=self.kill_process_bp)
+        self.kill_button.grid_propagate(False)
+        self.kill_button.place(relx=.1, y=5)
+        
         self.cpu_button.configure(state="disabled")
+        self.kill_button.configure(state="disabled")
         self.appearance_mode_optionemenu.set("Dark")
 
         self.bind("<Configure>", self.on_resize)
@@ -123,6 +132,11 @@ class App(customtkinter.CTk):
                 self.default_bg_color = "#383838"
                 for f in self.process_f:
                     f.configure(fg_color=self.default_bg_color)
+                    
+            if self.default_bg_color_s != "#839dd4":
+                self.default_bg_color_s = "#839dd4"
+                if self.selected_p != -1:
+                    self.process_f[self.selected_p].configure(fg_color=self.default_bg_color_s)
                 
         elif new_appearance_mode == "Light":
             mpl_style(dark=False)
@@ -130,6 +144,11 @@ class App(customtkinter.CTk):
                 self.default_bg_color = "#AFAFAF"
                 for f in self.process_f:
                     f.configure(fg_color=self.default_bg_color)
+            
+            if self.default_bg_color_s != "#48536b":
+                self.default_bg_color_s = "#48536b"
+                if self.selected_p != -1:
+                    self.process_f[self.selected_p].configure(fg_color=self.default_bg_color_s)
 
         self.re_plot()
 
@@ -199,9 +218,14 @@ class App(customtkinter.CTk):
         plist = back_end.get_processes()
         
         for i in range(min(len(plist), len(self.process_f))):
+            if i == self.selected_p and plist[i]['pid'] != self.selected_pid:
+                self.process_deselect()
+                
             self.process_labels[i][0].configure(text=plist[i]['name'])
             self.process_labels[i][1].configure(text=str(plist[i]['cpu_percent']) + "%")
             self.process_labels[i][2].configure(text=str(plist[i]['memory_percent']) + "%")
+            
+            self.pids[i] = plist[i]['pid']
             
             self.process_f[i].configure(require_redraw=True)
 
@@ -211,7 +235,7 @@ class App(customtkinter.CTk):
             for i in range(k):
                 f = customtkinter.CTkFrame(master=self.processes_frame, fg_color=self.default_bg_color, height=30, width=fwdt)
                 f.grid_propagate(False)
-                f.grid(row=len(self.process_f), column=0, padx=0, pady=2) 
+                f.grid(row=len(self.process_f), column=0, padx=0, pady=2)
                 
                 l1  = customtkinter.CTkLabel(text=plist[i]['name'], master=f, bg_color="transparent", width=fwdt*.6, anchor="w")
                 l1.grid(row=0, column=0, padx = (fwdt*.02, 0))
@@ -219,14 +243,22 @@ class App(customtkinter.CTk):
                 l2.grid(row=0, column=1)
                 l3  = customtkinter.CTkLabel(text=str(plist[i]['memory_percent'])+"%", master=f, bg_color="transparent", width=fwdt*.2, anchor="w")
                 l3.grid(row=0, column=2)
+                
+                f.bind("<Button-1>",lambda e,id=i:self.process_selected(id))
+                l1.bind("<Button-1>",lambda e,id=i:self.process_selected(id))
+                l2.bind("<Button-1>",lambda e,id=i:self.process_selected(id))
+                l3.bind("<Button-1>",lambda e,id=i:self.process_selected(id))
             
                 self.process_f.append(f)
                 self.process_labels.append([l1,l2,l3])
+                self.pids.append(plist[i]['pid'])
+                
         elif len(plist) < len(self.process_f):
             for i in range(len(self.process_f)-len(plist)):
                 self.process_f[-1].destroy()
                 self.process_f.pop()
                 self.process_labels.pop()
+                self.pids.pop()
         
     upd_ct = 18
     def update_data(self):
@@ -258,6 +290,45 @@ class App(customtkinter.CTk):
         self.memory_button.configure(state="disabled", require_redraw=True)
         
         back_end.sort_by = 'mem'
+        back_end._get_processes()
+        self.upd_ct = 19
+
+    selected_pid = -1
+    selected_p = -1
+    def process_selected(self, p):
+        self.process_deselect()
+        
+        self.selected_p = p
+        self.selected_pid = self.pids[p]
+        self.kill_button.configure(state="enabled")
+        
+        self.set_selected_s()
+        
+    def set_selected_s(self):
+        if self.selected_p != -1:
+            self.process_f[self.selected_p].configure(fg_color=self.default_bg_color_s)
+    
+    def reset_selected_s(self):
+        if self.selected_p != -1:
+            self.process_f[self.selected_p].configure(fg_color=self.default_bg_color)
+        
+    def process_deselect(self):
+        self.reset_selected_s()
+        
+        self.selected_pid = -1
+        self.selected_p = -1
+        self.kill_button.configure(state="disabled")
+        
+        
+    def kill_process_bp(self):
+        if self.selected_pid != -1:
+            if "win" in platform.platform().lower():
+                os.system(f"taskkill /F /PID {self.selected_pid}")
+                os.system(f"taskkill /F /IM {self.process_labels[self.selected_p][0]._text}")
+            else:
+                os.system(f"kill {self.selected_pid}")
+                
+        back_end.sort_by = 'cpu'
         back_end._get_processes()
         self.upd_ct = 19
 
